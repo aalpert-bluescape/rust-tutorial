@@ -40,6 +40,16 @@ enum Player {
     O
 }
 
+impl fmt::Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Player::X => write!(f, "X"),
+            Player::O => write!(f, "O"),
+        }
+    }
+}
+
+
 fn spot_char(o: &Option<Player>) -> String {
     match o {
         Some(Player::X) => "X".to_owned(),
@@ -99,9 +109,25 @@ impl Board {
     }
 
     fn play_ai(&mut self) {
+        if self.winner.is_some() {
+                return;
+        }
+        for i in 0..3 {
+            for j in 0..3 {
+                if self.board[i][j].is_none() {
+                    self.board[i][j] = Some(Player::O);
+                    return;
+                }
+            }
+        }
     }
 
-    fn check_winner(&mut self) { // Would be better if it was not &mut and a more functional style
+    // TODO: Handle draws
+    fn check_winner(&mut self) { // TODO: Would be better if it was not &mut and a more functional style
+        if self.winner.is_some() {
+                return;
+        }
+
         let mut rows: [i32;3] = [0,0,0];
         let mut cols: [i32;3] = [0,0,0];
         let mut diag_left: i32 = 0;
@@ -125,8 +151,19 @@ impl Board {
             }
         }
 
-        let all = rows.concat(&cols).append(diag_left).append(diag_right);
+        let mut all = vec![];
+        all.extend(rows);
+        all.extend(cols);
+        all.push(diag_left);
+        all.push(diag_right);
 
+        for v in all {
+            if v == 3 {
+                self.winner = Some(Player::X);
+            } else if v == -3 {
+                self.winner = Some(Player::O);
+            }
+        }
     }
 }
 
@@ -139,6 +176,11 @@ fn main() {
             println!("\x1B\x63Noughts & Crosses\n"); //\x1B\x63 clears previous terminal output
             board.print();
             redraw_flag = false;
+        }
+
+        if board.winner.is_some() {
+            println!("Player {} wins!", board.winner.unwrap());
+            break;
         }
 
         println!("Your move:");

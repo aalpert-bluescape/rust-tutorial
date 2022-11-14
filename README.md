@@ -19,3 +19,5 @@ Covers more ground, but less interesting
 Noughts and Crosses GUI
 
 More interesting, but maybe more slint and less rust?
+
+Based off the Slint tutorial: https://slint-ui.com/releases/0.3.1/docs/tutorial/rust/introduction.html
