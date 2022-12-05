@@ -11,8 +11,7 @@ impl Grid {
     }
 }
 
-#[derive(Debug, Clone)]
-enum GameState {
+#[derive(Debug, Clone, PartialEq)] enum GameState {
     Open,
     XWon,
     OWon,
@@ -39,6 +38,7 @@ fn calculate_state(grid: &Grid) -> GameState
         diag_right += grid.board[i][2-i];
     }
 
+    println!("r: {}", diag_right);
     let mut all = vec![];
     all.extend(rows);
     all.extend(cols);
@@ -66,12 +66,44 @@ mod tests {
 
     #[test]
     fn test_grid() {
-        let grid = Grid::new();
+        let _grid = Grid::new();
     }
 
     #[test]
     fn test_calculate_state() {
         let mut grid = Grid::new();
+
+        grid.board = [[0,0,0],[0,0,0],[0,0,0]];
+        assert_eq!(calculate_state(&grid), GameState::Open);
+
+        grid.board = [[1,1,1],[1,1,1],[1,1,1]];
+        assert_eq!(calculate_state(&grid), GameState::XWon);
+
+        grid.board = [[-1,-1,-1],[-1,-1,-1],[-1,-1,-1]];
+        assert_eq!(calculate_state(&grid), GameState::OWon);
+
+        grid.board = [[-1,1,-1],[1,-1,1],[1,-1,1]];
+        assert_eq!(calculate_state(&grid), GameState::Draw);
+
+        // Horizontal
+        grid.board = [[1,1,1],[-1,-1,0],[0,0,0]];
+        assert_eq!(calculate_state(&grid), GameState::XWon);
+
+        // Vertical
+        grid.board = [[1,-1,0],[1,-1,0],[1,0,0]];
+        assert_eq!(calculate_state(&grid), GameState::XWon);
+
+        // Diagonal
+        grid.board = [[1,-1,0],[0,1,0],[0,-1,1]];
+        assert_eq!(calculate_state(&grid), GameState::XWon);
+
+        // Other Diagonal
+        grid.board = [[-1,0,1],[0,1,0],[1,-1,0]];
+        assert_eq!(calculate_state(&grid), GameState::XWon);
+
+        // Same, but O
+        grid.board = [[1,0,-1],[0,-1,0],[-1,1,0]];
+        assert_eq!(calculate_state(&grid), GameState::OWon);
     }
 }
 
